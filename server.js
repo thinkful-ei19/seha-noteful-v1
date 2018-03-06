@@ -9,6 +9,7 @@ const notes = simDB.initialize(data);
 
 const app = express();
 app.use(express.static('public'));
+app.use(express.json());
 
 function requestLogger(req, res, next){
   // console.log(req, res, next);
@@ -32,15 +33,58 @@ app.get('/api/notes', requestLogger, (req, res) => {
 });
 
 
-app.get('/api/notes/:Id', (req, res) => {
-  const Id = req.params.Id;
-  const noteById = data.find(item => item.id === Number(Id));
-  res.json(noteById);
+app.get('/api/notes/:id', (req, res, next) => {
+  const id = req.params.id;
+  notes.find(id, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    else{
+      res.json(item);
+    }
+  });
 });
+
+app.put('/api/notes/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  const updateObj = {};
+  const updateFields = ['title', 'content'];
+
+  updateFields.forEach(field => {
+    if (field in req.body) {
+      updateObj[field] = req.body[field];
+    }
+  });
+
+  notes.update(id, updateObj, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next();
+    }
+  });
+});
+
+
 
 // app.get('/boom', (req, res, next) => {
 //   throw new Error('Boom!!');
 // });
+
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err); // goes to error handler
+    }
+    res.json(list); // responds with filtered array
+  });
+});
 
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
@@ -62,4 +106,3 @@ app.listen(PORT, function(){
 }).on('error', err => {
   console.error(err);
 });
-
