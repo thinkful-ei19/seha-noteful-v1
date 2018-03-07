@@ -25,10 +25,10 @@ notes.find(1005, (err, item) => {
 });
 
 // PUT (Update) Notes by ID
-const updateObj = {
-  title: 'New Title',
-  content: 'Blah blah blah'
-};
+// const updateObj = {
+//   title: 'New Title',
+//   content: 'Blah blah blah'
+// };
 
 notes.update(1005, updateObj, (err, item) => {
   if (err) {
