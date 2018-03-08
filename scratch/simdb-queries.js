@@ -5,30 +5,27 @@ const simDB = require('../db/simDB');
 const notes = simDB.initialize(data);
 
 // GET Notes with search
-notes.filter('cats', (err, list) => {
-  if (err) {
+notes.filter('cats')
+  .then(list => {
+    console.log(list);
+  })
+  .catch(err => {
     console.error(err);
-  }
-  console.log(list);
-});
+  });
 
 // GET Notes by ID
-notes.find(1005, (err, item) => {
-  if (err) {
-    console.error(err);
-  }
-  if (item) {
-    console.log(item);
-  } else {
-    console.log('not found');
-  }
-});
+notes.find(1005)
+  .then(item => {
+    if(item) {
+      res.json(item);
+    } else {
+      next();
+    }
+  })
+  .catch(err => {
+    next(err);
+  });
 
-// PUT (Update) Notes by ID
-// const updateObj = {
-//   title: 'New Title',
-//   content: 'Blah blah blah'
-// };
 
 notes.update(1005, updateObj, (err, item) => {
   if (err) {

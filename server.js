@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const data = require('./db/notes');
+
 const morgan = require('morgan');
 const { PORT } = require('./config');
 

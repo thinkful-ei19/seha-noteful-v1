@@ -11,28 +11,33 @@ const notes = simDB.initialize(data);
 router.get('/notes', (req, res, next) => {
   const { searchTerm } = req.query;
   
-  notes.filter(searchTerm, (err, list) => {
-    if (err) {
-      return next(err); // goes to error handler
-    }
-    res.json(list); // responds with filtered array
-  });
+  notes.filter(searchTerm)
+    .then(list => {
+      res.json(list);
+    })
+    .catch(err => {
+      console.log(err);
+      next(err);
+    }); 
 });
+
 
    
 // Get a single item
 router.get('/notes/:id', (req, res, next) => {
   const id = req.params.id;
-  notes.find(id, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if(item)
-      res.json(item);
-    else{
-      next(); //==>404
-    }
-  });
+  notes.find(id)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      }
+      else{
+        next(); 
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
 });
    
 // Put update an item
@@ -47,6 +52,18 @@ router.put('/notes/:id', (req, res, next) => {
       updateObj[field] = req.body[field];
     }
   });
+  notes.update(id, updateObj)
+    .then(item => {
+      if (item) {
+        res.json(item);
+      }
+      else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
 });
 
 router.post('/notes', (req, res, next) => {
@@ -58,30 +75,38 @@ router.post('/notes', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-  notes.create(newItem, (err, item) => {
-    if (err) {
-      return next(err);}
-    item ? res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item) : next();
-  });
-  
+
+  notes.create(newItem)
+    .then(item => {
+      if (item) {
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+      }
+      else{
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
 }); 
 
 router.delete('/notes/:id', (req, res, next) => {
   const id  = req.params.id;
 
-  notes.delete(id, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if(item) {
-      res.status(204).end();
-    }
-    else{
-      next();}
-  });
+  notes.delete(id)
+    .then(item => {
+      if (item) {
+        res.sendStatus(204);
+      }
+      else {
+        const err = new Error('Delete Id  not matching an id in DB');
+        err.status = 400;
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
 });
-
-
 
 
 module.exports = router;
