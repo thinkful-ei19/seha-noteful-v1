@@ -65,12 +65,26 @@ const noteful = (function () {
 
     });
   }
-  function newSearchTerm(searchTerm){
-    api.search(store.currentSearchTerm)
-      .then(updateResponse => {
-        store.notes = updateResponse;
-        render();
-      });
+  function newSearchTerm(data){
+    
+    if ($.type(data) === 'object') {
+      store.currentNote = data;
+      api.search(store.currentSearchTerm)
+        .then(updateResponse => {
+          store.notes = updateResponse;
+          render();
+        });
+    } else {
+      api.search(store.currentSearchTerm)
+        .then(searchResponse => {
+          store.notes = searchResponse;
+          if (data === store.currentNote.id) {
+            store.currentNote = {};
+          }
+          render();
+        });
+    }
+  
   }
 
   function handleNoteFormSubmit() {
@@ -84,20 +98,19 @@ const noteful = (function () {
         title: editForm.find('.js-note-title-entry').val(),
         content: editForm.find('.js-note-content-entry').val()
       };
-      if (noteObj) {
-        api.update(store.currentNote.id, noteObj)
-          .then(updateResponse => {
-            store.currentNote = updateResponse;
-            
-          });
+      if (store.currentNote.id) {
+        api.update(noteObj.id, noteObj)
+          .then(newSearchTerm);
+        // updateResponse => {
+        // store.currentNote = updateResponse;    
       }
       else {
         api.create(noteObj)
-          .then(updateResponse => {
-            store.currentNote = updateResponse;
-            newSearchTerm();
-            
-          });
+          .then(newSearchTerm);  
+        // (updateResponse => {
+        //   store.currentNote = updateResponse;
+        //   newSearchTerm();            
+        // });
       }
     });
   }
@@ -144,6 +157,7 @@ const noteful = (function () {
   return {
     render: render,
     bindEventListeners: bindEventListeners,
+    newSearchTerm 
   };
 
 }());
