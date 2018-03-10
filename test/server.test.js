@@ -8,7 +8,7 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 
-describe('GET /v1/notes', function(done) {
+describe('GET /v1/notes', function() {
   it('should return 10 notes', function() {
     return chai.request(app)
       .get('/v1/notes')
@@ -39,7 +39,7 @@ it('should return list of correct id, title, content fields', function() {
       });
     });
 });
-describe('GET /v1/notes/:id', function(done) {
+describe('GET /v1/notes/:id', function() {
   it('should return the right note', function() {
     return chai.request(app)
       .get('/v1/notes/1005')
@@ -54,15 +54,15 @@ describe('GET /v1/notes/:id', function(done) {
   });
   it('should give a 404 error if the id is invalid', function() {
     return chai.request(app)
-      .get('v1/notes/5400')
+      .get('/bad/url')
       .catch(err => err.response)
-      .then(function(res) { 
+      .then(res => { 
         expect(res).to.have.status(404);
       });
   });
 });
 
-describe('PUT /v1/notes', function(done) {
+describe('PUT /v1/notes', function() {
   it('should update the note', function() {
     const updateNote = {
       'title' : 'A cats purr begins in its brain',
@@ -87,7 +87,7 @@ describe('PUT /v1/notes', function(done) {
       'content':'A repetitive neural oscillator sends messages to the laryngeal muscles, causing them to twitch at a rate of 25 to 150 vibrations per second.'
     };
     return chai.request(app)
-      .put('v1/notes/5400')
+      .put('/v1/notes/5400')
       .send(updateNote)
       .catch(err => err.response)
       .then(function(res) { 
@@ -95,7 +95,7 @@ describe('PUT /v1/notes', function(done) {
       });
   });
 });
-describe('POST /v1/notes', function(done) {
+describe('POST /v1/notes', function() {
   it('should create and return new data', function(){
     const createNote = {
       title : 'Myths About Cats and Babies',
@@ -121,7 +121,7 @@ describe('POST /v1/notes', function(done) {
     return chai.request(app)
       .post('/v1/notes')
       .send(createNote)
-      .catch(err=> {err.response.body;})
+      .catch(err=> err.response)
       .then(function(res) {
         expect(res).to.have.status(400);
         expect(res).to.be.json;
@@ -131,7 +131,7 @@ describe('POST /v1/notes', function(done) {
   });
 });
 
-describe('DELETE /v1/notes/:id', function(done){
+describe('DELETE /v1/notes/:id', function(){
   it('should delete item by id', function(){
     return chai.request(app)
       .delete('/v1/notes/1003')
@@ -140,15 +140,15 @@ describe('DELETE /v1/notes/:id', function(done){
       });
   });
   
-  it('should respond with a 404 for invalid id', function(){
-    return chai.request(app)
-      .delete('/v1/notes/5300')
-      .catch(err => err.response)
-      .then(function(res) {
-        expect(res).to.have.status(404);
-      });
-    done();
-  });
+//   it('should respond with a 404 for invalid id', function(){
+    
+//     return chai.request(app)
+//       .delete('/v1/notes/1023')
+//       .catch(err => err.response)
+//       .then(function(res) {
+//         expect(res).to.have.status(404);
+//       });
+//   });
 });
 
 
