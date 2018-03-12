@@ -134,14 +134,14 @@ const noteful = (function () {
         });
     });
   }  
-  // api.delete(noteId)
-  //   .then(() => {
-  //     api.search(store.currentSearchTerm)
-  //       .then(searchResponse => {
-  //         store.notes = searchResponse;
-  //         render();
-  //       });
-  //   });   
+  api.delete(noteId)
+    .then(() => {
+      api.search(store.currentSearchTerm)
+        .then(searchResponse => {
+          store.notes = searchResponse;
+          render();
+        });
+    });   
   
 
   function bindEventListeners() {
